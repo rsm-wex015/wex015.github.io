@@ -1,0 +1,13 @@
+---
+title: "Wendy Xu"
+image: "files/profile_pic.jpg"
+about:
+  template: jolla
+  links:
+    - icon: envelope
+      href: mailto:wex015@ucsd.edu
+    - icon: linkedin
+      href: https://www.linkedin.com/in/wenxin-wendy-xu-81115b311
+---
+
+Welcome to my website!
