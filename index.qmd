@@ -1,5 +1,5 @@
 ---
-title: "Wendy Xu"
+title: "Wenxin(Wendy) Xu"
 image: "files/profile_pic.jpg"
 about:
   template: jolla
