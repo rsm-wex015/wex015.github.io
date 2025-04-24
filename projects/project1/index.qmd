@@ -197,22 +197,37 @@ This initial analysis replicates the paper’s key finding: matching incentives 
 
 We test whether the observed difference in donation behavior is statistically significant, using both a **t-test** and a **bivariate regression**.
 ```{python}
+import pandas as pd
 from scipy.stats import ttest_ind
-import statsmodels.api as sm
+control = df[df["treatment"] == 0]["gave"]
+treatment = df[df["treatment"] == 1]["gave"]
+t_stat, p_val = ttest_ind(treatment, control, equal_var=False)
+print(f"""
+T-Test Summary
+
+- T-statistic**: {t_stat:.4f}
+- P-value**: {p_val:.4f}
+""")
+```
+
+```{python}
 import statsmodels.formula.api as smf
 
-# Group samples
-control = df[df['treatment'] == 0]['gave']
-treatment = df[df['treatment'] == 1]['gave']
-
-# T-test (unequal variance)
-t_stat, p_val = ttest_ind(treatment, control, equal_var=False)
-
-# OLS Regression
+# Fit the model
 model = smf.ols("gave ~ treatment", data=df).fit()
-reg_summary = model.summary()
-print(t_stat, p_val, reg_summary)
-print(f"T-statistic: {t_stat:.4f}, P-value: {p_val:.4f}")
+coef = model.params["treatment"]
+pval = model.pvalues["treatment"]
+ci_low, ci_high = model.conf_int().loc["treatment"]
+baseline = model.params["Intercept"]
+
+print(f"""
+Key Findings
+
+- Baseline Donation Rate (Control Group)**: {baseline:.2%}
+- Treatment Effect**: +{coef:.2%}
+- P-value**: {pval:.4f}
+- 95% Confidence Interval**: [{ci_low:.2%}, {ci_high:.2%}]
+""")
 ```
 Both tests lead to the same conclusion:
 
@@ -275,12 +290,21 @@ To further assess whether larger match ratios increase donation behavior, we est
 ```{python}
 import statsmodels.formula.api as smf
 
-# Filter treatment group only
-df_match = df[df['treatment'] == 1]
+df_match = df[df["treatment"] == 1]
 
-# Estimate linear model: 1:1 match is omitted category
 model = smf.ols("gave ~ ratio2 + ratio3", data=df_match).fit()
-model.summary()
+
+coef = model.params
+pval = model.pvalues
+ci = model.conf_int()
+
+print(f"""
+Key Results
+
+- Baseline Donation Rate (1:1 match): {coef['Intercept']:.2%}
+- 2:1 Match Effect (ratio2): {coef['ratio2']:.2%} (p = {pval['ratio2']:.3f}, 95% CI: [{ci.loc['ratio2', 0]:.2%}, {ci.loc['ratio2', 1]:.2%}])
+- 3:1 Match Effect (ratio3): {coef['ratio3']:.2%} (p = {pval['ratio3']:.3f}, 95% CI: [{ci.loc['ratio3', 0]:.2%}, {ci.loc['ratio3', 1]:.2%}])
+""")
 ```
 This regression estimates how larger matching ratios affect the probability of donating.
 
@@ -345,16 +369,33 @@ We compare donation amounts between treatment and control groups using both a **
 from scipy.stats import ttest_ind
 import statsmodels.formula.api as smf
 
-# Split donation amount by treatment status
+# Separate groups
 amount_control = df[df['treatment'] == 0]['amount']
 amount_treatment = df[df['treatment'] == 1]['amount']
 
-# T-test for amount differences
-ttest_amount = ttest_ind(amount_treatment, amount_control, equal_var=False)
+# T-test
+t_stat, p_val = ttest_ind(amount_treatment, amount_control, equal_var=False)
 
-# Linear regression: donation amount ~ treatment
+# Regression
 model_amount = smf.ols("amount ~ treatment", data=df).fit()
-ttest_amount, model_amount.summary()
+
+# Extract results
+coef = model_amount.params
+pvals = model_amount.pvalues
+ci = model_amount.conf_int()
+print(f"""
+T-Test Result
+
+- T-statistic**: {t_stat:.4f}
+- P-value**: {p_val:.4f}
+
+Regression Summary
+
+- Baseline Amount (Control Group)**: ${coef['Intercept']:.2f}
+- Treatment Effect**: +${coef['treatment']:.2f}
+- P-value: {pvals['treatment']:.3f}
+- 95% CI: [${ci.loc['treatment', 0]:.2f}, ${ci.loc['treatment', 1]:.2f}]
+""")
 ```
 The t-test yields a p-value of approximately 0.055, just above the standard 0.05 significance threshold.
 The regression model estimates that individuals in the treatment group give on average $0.15 more, with a p-value of 0.063. Both results suggest a positive but marginally insignificant effect.
@@ -374,9 +415,24 @@ From a fundraising perspective, this tells us that match incentives work best fo
 
 To investigate whether the matching offer influences **how much people give**, we now restrict our analysis to **only those individuals who made a donation**. This allows us to analyze donation amounts **conditional on giving**.
 ```{python}
-df_positive = df[df['gave'] == 1]
+# Subset to donors only
+df_positive = df[df["gave"] == 1]
+
+# Run regression
 model_conditional = smf.ols("amount ~ treatment", data=df_positive).fit()
-model_conditional.summary()
+
+# Extract results
+coef = model_conditional.params
+pval = model_conditional.pvalues
+ci = model_conditional.conf_int()
+print(f"""
+Regression Summary
+
+- Baseline Donation (Control Group)**: ${coef['Intercept']:.2f}
+- Treatment Effect**: {coef['treatment']:+.2f}
+- P-value: {pval['treatment']:.3f}
+- 95% Confidence Interval: [{ci.loc['treatment', 0]:.2f}, {ci.loc['treatment', 1]:.2f}]
+""")
 ```
 This regression estimates how the presence of a matching offer affects the size of the donation, among those who chose to give.
 The intercept (45.54) represents the average donation in the control group.
