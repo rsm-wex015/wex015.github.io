@@ -307,7 +307,6 @@ Key Results
 """)
 ```
 This regression estimates how larger matching ratios affect the probability of donating.
-
 The intercept (0.0207) represents the average donation rate for the 1:1 match group — about 2.1%.
 The coefficient on ratio2 (2:1 match) is +0.0019, and the coefficient on ratio3 (3:1 match) is +0.0020.
 However, both of these coefficients are statistically insignificant (p-values > 0.3), meaning that we cannot rule out that they are due to random chance.
