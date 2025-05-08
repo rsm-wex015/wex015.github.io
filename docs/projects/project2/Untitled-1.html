@@ -157,11 +157,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div id="de4062b1" class="cell" data-execution_count="8">
+<div id="de4062b1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'projects/project2/blueprinty.csv'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'blueprinty.csv'</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -217,12 +217,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="ae7b6cb5" class="cell" data-execution_count="6">
+<div id="ae7b6cb5" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload the dataset</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"projects/project2/blueprinty.csv"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"blueprinty.csv"</span>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the combined histogram + KDE plot</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
@@ -243,10 +243,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="44859cba" class="cell" data-execution_count="7">
+<div id="44859cba" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>age_distribution_non_customers <span class="op">=</span> df[df[<span class="st">'iscustomer'</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">'age'</span>].value_counts().sort_index()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>age_distribution_non_customers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>age
 9.0     1
 9.5     1
@@ -260,6 +260,1066 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 46.5    1
 47.5    1
 Name: count, Length: 72, dtype: int64</code></pre>
+</div>
+</div>
+<div id="2f26a5bc" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_loglikelihood(lmbda, y):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Compute the log-likelihood of a Poisson model.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">        lmbda: array-like, predicted Poisson means (e.g. exp(X @ beta))</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">        y: array-like, observed counts</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">        log-likelihood value (scalar)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    lmbda <span class="op">=</span> np.asarray(lmbda)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.asarray(y)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(<span class="op">-</span>lmbda <span class="op">+</span> y <span class="op">*</span> np.log(lmbda) <span class="op">-</span> gammaln(y <span class="op">+</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="42386255" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y_obs_full <span class="op">=</span> df[<span class="st">'patents'</span>].values</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>lambda_range <span class="op">=</span> np.linspace(<span class="fl">0.1</span>, <span class="dv">10</span>, <span class="dv">200</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>log_likelihoods_full <span class="op">=</span> [poisson_loglikelihood(lmbda<span class="op">=</span>np.repeat(lmb, <span class="bu">len</span>(y_obs_full)), y<span class="op">=</span>y_obs_full)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">for</span> lmb <span class="kw">in</span> lambda_range]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.plot(lambda_range, log_likelihoods_full)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Poisson Log-Likelihood vs Lambda (Full Sample)'</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Lambda (shared across firms)'</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Log-Likelihood'</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Untitled-1_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cbbdf10e" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 定义负的 log-likelihood（因为 minimize 默认最小化）</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_log_likelihood(lmbda_scalar, y):</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    lmbda <span class="op">=</span> np.repeat(lmbda_scalar[<span class="dv">0</span>], <span class="bu">len</span>(y))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>np.<span class="bu">sum</span>(<span class="op">-</span>lmbda <span class="op">+</span> y <span class="op">*</span> np.log(lmbda) <span class="op">-</span> gammaln(y <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 目标数据</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>y_data <span class="op">=</span> df[<span class="st">'patents'</span>].values</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 初始猜测（可以用平均值）</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>initial_guess <span class="op">=</span> [np.mean(y_data)]</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 scipy.optimize.minimize 进行拟合</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> minimize(neg_log_likelihood, x0<span class="op">=</span>initial_guess, args<span class="op">=</span>(y_data,), bounds<span class="op">=</span>[(<span class="fl">0.0001</span>, <span class="va">None</span>)])</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 打印结果</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>lambda_mle <span class="op">=</span> result.x[<span class="dv">0</span>]</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"MLE for lambda (via optimization): </span><span class="sc">{</span>lambda_mle<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MLE for lambda (via optimization): 3.6847</code></pre>
+</div>
+</div>
+<div id="4eae653f" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> neg_poisson_loglikelihood(beta, X, y):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> np.asarray(beta)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.asarray(X)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.asarray(y)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    linear_pred <span class="op">=</span> X <span class="op">@</span> beta</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    lmbda <span class="op">=</span> np.exp(linear_pred)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    log_lik <span class="op">=</span> <span class="op">-</span>lmbda <span class="op">+</span> y <span class="op">*</span> np.log(lmbda) <span class="op">-</span> gammaln(y <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>np.<span class="bu">sum</span>(log_lik)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="e6257eae" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[[<span class="st">'age'</span>]].copy()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'age_squared'</span>] <span class="op">=</span> X[<span class="st">'age'</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'iscustomer'</span>] <span class="op">=</span> df[<span class="st">'iscustomer'</span>]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> pd.concat([X, pd.get_dummies(df[<span class="st">'region'</span>], drop_first<span class="op">=</span><span class="va">True</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.astype(<span class="bu">float</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.values</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'patents'</span>].values</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>init_beta <span class="op">=</span> np.ones(X.shape[<span class="dv">1</span>]) <span class="op">*</span> <span class="fl">0.1</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> minimize(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    fun<span class="op">=</span>neg_poisson_loglikelihood,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    x0<span class="op">=</span>init_beta,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>(X, y),</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">'Nelder-Mead'</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    options<span class="op">=</span>{<span class="st">'disp'</span>: <span class="va">True</span>, <span class="st">'maxiter'</span>: <span class="dv">1000</span>}</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>beta_mle <span class="op">=</span> res.x</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Estimated beta coefficients:"</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(beta_mle)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimization terminated successfully.
+         Current function value: 3266.879001
+         Iterations: 577
+         Function evaluations: 905
+Estimated beta coefficients:
+[ 0.10525892 -0.00218266  0.14027886  0.13123288  0.05349781  0.1434903
+  0.12860536]</code></pre>
+</div>
+</div>
+<div id="92a0ed38" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       message: Optimization terminated successfully.
+       success: True
+        status: 0
+           fun: 3266.879001345187
+             x: [ 1.053e-01 -2.183e-03  1.403e-01  1.312e-01  5.350e-02
+                  1.435e-01  1.286e-01]
+           nit: 577
+          nfev: 905
+ final_simplex: (array([[ 1.053e-01, -2.183e-03, ...,  1.435e-01,
+                         1.286e-01],
+                       [ 1.052e-01, -2.182e-03, ...,  1.435e-01,
+                         1.286e-01],
+                       ...,
+                       [ 1.052e-01, -2.182e-03, ...,  1.435e-01,
+                         1.286e-01],
+                       [ 1.053e-01, -2.183e-03, ...,  1.435e-01,
+                         1.285e-01]]), array([ 3.267e+03,  3.267e+03,  3.267e+03,  3.267e+03,
+                        3.267e+03,  3.267e+03,  3.267e+03,  3.267e+03]))</code></pre>
+</div>
+</div>
+<div id="0432d03f" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[[<span class="st">'age'</span>]].copy()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'age_squared'</span>] <span class="op">=</span> X[<span class="st">'age'</span>] <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'iscustomer'</span>] <span class="op">=</span> df[<span class="st">'iscustomer'</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>X.insert(<span class="dv">0</span>, <span class="st">'intercept'</span>, <span class="dv">1</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> pd.concat([X, pd.get_dummies(df[<span class="st">'region'</span>], drop_first<span class="op">=</span><span class="va">True</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.astype(<span class="bu">float</span>).values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="f5cd0b6a" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>init_beta <span class="op">=</span> np.zeros(X.shape[<span class="dv">1</span>])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> minimize(</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    fun<span class="op">=</span>neg_poisson_loglikelihood,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    x0<span class="op">=</span>init_beta,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>(X, y),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    method<span class="op">=</span><span class="st">'Nelder-Mead'</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    options<span class="op">=</span>{<span class="st">'disp'</span>: <span class="va">True</span>, <span class="st">'maxiter'</span>: <span class="dv">2000</span>}</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>beta_mle <span class="op">=</span> res.x</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Estimated beta coefficients:"</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(beta_mle)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimization terminated successfully.
+         Current function value: 3259.214530
+         Iterations: 685
+         Function evaluations: 1054
+Estimated beta coefficients:
+[-0.32950681  0.13700644 -0.00276358  0.21449006 -0.01353866 -0.05320079
+  0.02214911  0.04299568]</code></pre>
+</div>
+</div>
+<div id="69164ef0" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numdifftools <span class="im">as</span> nd</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>hessian_fun <span class="op">=</span> nd.Hessian(<span class="kw">lambda</span> b: neg_poisson_loglikelihood(b, X, y))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> hessian_fun(beta_mle)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>cov_matrix <span class="op">=</span> np.linalg.inv(H)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>standard_errors <span class="op">=</span> np.sqrt(np.diag(cov_matrix))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>columns <span class="op">=</span> [<span class="st">'intercept'</span>, <span class="st">'age'</span>, <span class="st">'age_squared'</span>, <span class="st">'iscustomer'</span>] <span class="op">+</span> <span class="bu">list</span>(pd.get_dummies(df[<span class="st">'region'</span>], drop_first<span class="op">=</span><span class="va">True</span>).columns)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>results_table <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Variable'</span>: columns,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Beta'</span>: beta_mle,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Std. Error'</span>: standard_errors</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>results_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/32/xz9pd3zx1yv2tk_19psx52z40000gn/T/ipykernel_23113/3045299706.py:11: RuntimeWarning: overflow encountered in exp
+  lmbda = np.exp(linear_pred)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Variable</th>
+<th data-quarto-table-cell-role="th">Beta</th>
+<th data-quarto-table-cell-role="th">Std. Error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>intercept</td>
+<td>-0.329507</td>
+<td>6.520750e-02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>age</td>
+<td>0.137006</td>
+<td>2.057879e-03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>age_squared</td>
+<td>-0.002764</td>
+<td>1.473287e-09</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>iscustomer</td>
+<td>0.214490</td>
+<td>3.075139e-02</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Northeast</td>
+<td>-0.013539</td>
+<td>4.321331e-02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Northwest</td>
+<td>-0.053201</td>
+<td>5.356145e-02</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>South</td>
+<td>0.022149</td>
+<td>5.239738e-02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Southwest</td>
+<td>0.042996</td>
+<td>4.660574e-02</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="54e7e0ec" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>X_check <span class="op">=</span> df[[<span class="st">'age'</span>]].copy()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>X_check[<span class="st">'age_squared'</span>] <span class="op">=</span> X_check[<span class="st">'age'</span>]<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>X_check[<span class="st">'iscustomer'</span>] <span class="op">=</span> df[<span class="st">'iscustomer'</span>]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>X_check <span class="op">=</span> pd.concat([X_check, pd.get_dummies(df[<span class="st">'region'</span>], drop_first<span class="op">=</span><span class="va">True</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>X_check <span class="op">=</span> sm.add_constant(X_check) </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>X_check <span class="op">=</span> X_check.astype(<span class="bu">float</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>glm_poisson <span class="op">=</span> sm.GLM(df[<span class="st">'patents'</span>], X_check, family<span class="op">=</span>sm.families.Poisson())</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>glm_results <span class="op">=</span> glm_poisson.fit()</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(glm_results.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                patents   No. Observations:                 1500
+Model:                            GLM   Df Residuals:                     1492
+Model Family:                 Poisson   Df Model:                            7
+Link Function:                    Log   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -3258.1
+Date:                Wed, 07 May 2025   Deviance:                       2143.3
+Time:                        19:37:52   Pearson chi2:                 2.07e+03
+No. Iterations:                     5   Pseudo R-squ. (CS):             0.1360
+Covariance Type:            nonrobust                                         
+===============================================================================
+                  coef    std err          z      P&gt;|z|      [0.025      0.975]
+-------------------------------------------------------------------------------
+const          -0.5089      0.183     -2.778      0.005      -0.868      -0.150
+age             0.1486      0.014     10.716      0.000       0.121       0.176
+age_squared    -0.0030      0.000    -11.513      0.000      -0.003      -0.002
+iscustomer      0.2076      0.031      6.719      0.000       0.147       0.268
+Northeast       0.0292      0.044      0.669      0.504      -0.056       0.115
+Northwest      -0.0176      0.054     -0.327      0.744      -0.123       0.088
+South           0.0566      0.053      1.074      0.283      -0.047       0.160
+Southwest       0.0506      0.047      1.072      0.284      -0.042       0.143
+===============================================================================</code></pre>
+</div>
+</div>
+<div id="fcea97be" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming X and y are your data</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>X_df <span class="op">=</span> pd.DataFrame(X, columns<span class="op">=</span>[</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'intercept'</span>, <span class="st">'age'</span>, <span class="st">'age_squared'</span>, <span class="st">'iscustomer'</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Northeast'</span>, <span class="st">'Northwest'</span>, <span class="st">'South'</span>, <span class="st">'Southwest'</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model if it's not already done</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.GLM(y, X_df, family<span class="op">=</span>sm.families.Poisson(link<span class="op">=</span>sm.families.links.log())).fit()</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Now create counterfactuals</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>X_0 <span class="op">=</span> X_df.copy()</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>X_0[<span class="st">'iscustomer'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>X_1 <span class="op">=</span> X_df.copy()</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>X_1[<span class="st">'iscustomer'</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>y_pred_0 <span class="op">=</span> model.predict(X_0)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>y_pred_1 <span class="op">=</span> model.predict(X_1)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Treatment effect</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>treatment_effect <span class="op">=</span> y_pred_1 <span class="op">-</span> y_pred_0</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>average_effect <span class="op">=</span> treatment_effect.mean()</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>average_effect</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/wenxinxu/Library/Python/3.9/lib/python/site-packages/statsmodels/genmod/families/links.py:13: FutureWarning: The log link alias is deprecated. Use Log instead. The log link alias will be removed after the 0.15.0 release.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>np.float64(0.7927680710452972)</code></pre>
+</div>
+</div>
+<div id="ebe34723" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"airbnb.csv"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">days</th>
+<th data-quarto-table-cell-role="th">last_scraped</th>
+<th data-quarto-table-cell-role="th">host_since</th>
+<th data-quarto-table-cell-role="th">room_type</th>
+<th data-quarto-table-cell-role="th">bathrooms</th>
+<th data-quarto-table-cell-role="th">bedrooms</th>
+<th data-quarto-table-cell-role="th">price</th>
+<th data-quarto-table-cell-role="th">number_of_reviews</th>
+<th data-quarto-table-cell-role="th">review_scores_cleanliness</th>
+<th data-quarto-table-cell-role="th">review_scores_location</th>
+<th data-quarto-table-cell-role="th">review_scores_value</th>
+<th data-quarto-table-cell-role="th">instant_bookable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>2515</td>
+<td>3130</td>
+<td>4/2/2017</td>
+<td>9/6/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>59</td>
+<td>150</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2595</td>
+<td>3127</td>
+<td>4/2/2017</td>
+<td>9/9/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>230</td>
+<td>20</td>
+<td>9.0</td>
+<td>10.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3647</td>
+<td>3050</td>
+<td>4/2/2017</td>
+<td>11/25/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>150</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>3831</td>
+<td>3038</td>
+<td>4/2/2017</td>
+<td>12/7/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>89</td>
+<td>116</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>4611</td>
+<td>3012</td>
+<td>4/2/2017</td>
+<td>1/2/2009</td>
+<td>Private room</td>
+<td>NaN</td>
+<td>1.0</td>
+<td>39</td>
+<td>93</td>
+<td>9.0</td>
+<td>8.0</td>
+<td>9.0</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="0fddccf0" class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">days</th>
+<th data-quarto-table-cell-role="th">last_scraped</th>
+<th data-quarto-table-cell-role="th">host_since</th>
+<th data-quarto-table-cell-role="th">room_type</th>
+<th data-quarto-table-cell-role="th">bathrooms</th>
+<th data-quarto-table-cell-role="th">bedrooms</th>
+<th data-quarto-table-cell-role="th">price</th>
+<th data-quarto-table-cell-role="th">number_of_reviews</th>
+<th data-quarto-table-cell-role="th">review_scores_cleanliness</th>
+<th data-quarto-table-cell-role="th">review_scores_location</th>
+<th data-quarto-table-cell-role="th">review_scores_value</th>
+<th data-quarto-table-cell-role="th">instant_bookable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>2515</td>
+<td>3130</td>
+<td>4/2/2017</td>
+<td>9/6/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>59</td>
+<td>150</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2595</td>
+<td>3127</td>
+<td>4/2/2017</td>
+<td>9/9/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>230</td>
+<td>20</td>
+<td>9.0</td>
+<td>10.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3647</td>
+<td>3050</td>
+<td>4/2/2017</td>
+<td>11/25/2008</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>150</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>f</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>3831</td>
+<td>3038</td>
+<td>4/2/2017</td>
+<td>12/7/2008</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>89</td>
+<td>116</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>9.0</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>4611</td>
+<td>3012</td>
+<td>4/2/2017</td>
+<td>1/2/2009</td>
+<td>Private room</td>
+<td>NaN</td>
+<td>1.0</td>
+<td>39</td>
+<td>93</td>
+<td>9.0</td>
+<td>8.0</td>
+<td>9.0</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40623</td>
+<td>40624</td>
+<td>18008937</td>
+<td>266</td>
+<td>4/2/2017</td>
+<td>7/10/2016</td>
+<td>Entire home/apt</td>
+<td>1.5</td>
+<td>2.0</td>
+<td>150</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">40624</td>
+<td>40625</td>
+<td>18009045</td>
+<td>366</td>
+<td>4/2/2017</td>
+<td>4/1/2016</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>125</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40625</td>
+<td>40626</td>
+<td>18009065</td>
+<td>587</td>
+<td>4/2/2017</td>
+<td>8/24/2015</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>80</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>t</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">40626</td>
+<td>40627</td>
+<td>18009650</td>
+<td>335</td>
+<td>4/2/2017</td>
+<td>5/2/2016</td>
+<td>Private room</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>69</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>t</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40627</td>
+<td>40628</td>
+<td>18009669</td>
+<td>1</td>
+<td>4/2/2017</td>
+<td>4/1/2017</td>
+<td>Entire home/apt</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>115</td>
+<td>0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>t</td>
+</tr>
+</tbody>
+</table>
+
+<p>40628 rows × 14 columns</p>
+</div>
+</div>
+</div>
+<div id="402157f0" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df.describe()</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>df.isna().mean().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>review_scores_value          0.252437
+review_scores_location       0.252388
+review_scores_cleanliness    0.250935
+bathrooms                    0.003938
+bedrooms                     0.001871
+host_since                   0.000861
+Unnamed: 0                   0.000000
+id                           0.000000
+days                         0.000000
+last_scraped                 0.000000
+room_type                    0.000000
+price                        0.000000
+number_of_reviews            0.000000
+instant_bookable             0.000000
+dtype: float64</code></pre>
+</div>
+</div>
+<div id="354e8055" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.dropna(subset<span class="op">=</span>[</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'review_scores_value'</span>, </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'review_scores_location'</span>, </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'review_scores_cleanliness'</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="c5cae7c2" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Poisson regression model</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> smf.glm(</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"number_of_reviews ~ price + C(room_type) + review_scores_cleanliness + review_scores_location + review_scores_value + C(instant_bookable)"</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span>sm.families.Poisson()</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>model.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Generalized Linear Model Regression Results</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>number_of_reviews</td>
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>30346</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Model:</td>
+<td>GLM</td>
+<td data-quarto-table-cell-role="th">Df Residuals:</td>
+<td>30338</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Model Family:</td>
+<td>Poisson</td>
+<td data-quarto-table-cell-role="th">Df Model:</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Link Function:</td>
+<td>Log</td>
+<td data-quarto-table-cell-role="th">Scale:</td>
+<td>1.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Method:</td>
+<td>IRLS</td>
+<td data-quarto-table-cell-role="th">Log-Likelihood:</td>
+<td>-5.3507e+05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Wed, 07 May 2025</td>
+<td data-quarto-table-cell-role="th">Deviance:</td>
+<td>9.4783e+05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>20:03:25</td>
+<td data-quarto-table-cell-role="th">Pearson chi2:</td>
+<td>1.42e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No. Iterations:</td>
+<td>6</td>
+<td data-quarto-table-cell-role="th">Pseudo R-squ. (CS):</td>
+<td>0.5380</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Covariance Type:</td>
+<td>nonrobust</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">coef</td>
+<td data-quarto-table-cell-role="th">std err</td>
+<td data-quarto-table-cell-role="th">z</td>
+<td data-quarto-table-cell-role="th">P&gt;|z|</td>
+<td data-quarto-table-cell-role="th">[0.025</td>
+<td data-quarto-table-cell-role="th">0.975]</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intercept</td>
+<td>3.5679</td>
+<td>0.015</td>
+<td>233.369</td>
+<td>0.000</td>
+<td>3.538</td>
+<td>3.598</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(room_type)[T.Private room]</td>
+<td>-0.0252</td>
+<td>0.003</td>
+<td>-9.406</td>
+<td>0.000</td>
+<td>-0.031</td>
+<td>-0.020</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(room_type)[T.Shared room]</td>
+<td>-0.2648</td>
+<td>0.009</td>
+<td>-30.926</td>
+<td>0.000</td>
+<td>-0.282</td>
+<td>-0.248</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(instant_bookable)[T.t]</td>
+<td>0.3324</td>
+<td>0.003</td>
+<td>115.542</td>
+<td>0.000</td>
+<td>0.327</td>
+<td>0.338</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">price</td>
+<td>-7.422e-06</td>
+<td>7.57e-06</td>
+<td>-0.980</td>
+<td>0.327</td>
+<td>-2.23e-05</td>
+<td>7.42e-06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">review_scores_cleanliness</td>
+<td>0.1130</td>
+<td>0.001</td>
+<td>76.151</td>
+<td>0.000</td>
+<td>0.110</td>
+<td>0.116</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">review_scores_location</td>
+<td>-0.0821</td>
+<td>0.002</td>
+<td>-51.797</td>
+<td>0.000</td>
+<td>-0.085</td>
+<td>-0.079</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">review_scores_value</td>
+<td>-0.0900</td>
+<td>0.002</td>
+<td>-50.354</td>
+<td>0.000</td>
+<td>-0.094</td>
+<td>-0.087</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="389608c6" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model (formula same as in Poisson)</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>nb_model <span class="op">=</span> smf.glm(</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"number_of_reviews ~ price + C(room_type) + C(instant_bookable) + review_scores_cleanliness + review_scores_location + review_scores_value"</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span>sm.families.NegativeBinomial()</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>nb_model.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/wenxinxu/Library/Python/3.9/lib/python/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.
+  warnings.warn("Negative binomial dispersion parameter alpha not "</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Generalized Linear Model Regression Results</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>number_of_reviews</td>
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>30346</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Model:</td>
+<td>GLM</td>
+<td data-quarto-table-cell-role="th">Df Residuals:</td>
+<td>30338</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Model Family:</td>
+<td>NegativeBinomial</td>
+<td data-quarto-table-cell-role="th">Df Model:</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Link Function:</td>
+<td>Log</td>
+<td data-quarto-table-cell-role="th">Scale:</td>
+<td>1.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Method:</td>
+<td>IRLS</td>
+<td data-quarto-table-cell-role="th">Log-Likelihood:</td>
+<td>-1.2313e+05</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Wed, 07 May 2025</td>
+<td data-quarto-table-cell-role="th">Deviance:</td>
+<td>48337.</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>20:15:00</td>
+<td data-quarto-table-cell-role="th">Pearson chi2:</td>
+<td>6.51e+04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No. Iterations:</td>
+<td>21</td>
+<td data-quarto-table-cell-role="th">Pseudo R-squ. (CS):</td>
+<td>0.04292</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Covariance Type:</td>
+<td>nonrobust</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">coef</td>
+<td data-quarto-table-cell-role="th">std err</td>
+<td data-quarto-table-cell-role="th">z</td>
+<td data-quarto-table-cell-role="th">P&gt;|z|</td>
+<td data-quarto-table-cell-role="th">[0.025</td>
+<td data-quarto-table-cell-role="th">0.975]</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intercept</td>
+<td>4.2213</td>
+<td>0.077</td>
+<td>55.167</td>
+<td>0.000</td>
+<td>4.071</td>
+<td>4.371</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(room_type)[T.Private room]</td>
+<td>-0.0054</td>
+<td>0.013</td>
+<td>-0.429</td>
+<td>0.668</td>
+<td>-0.030</td>
+<td>0.019</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(room_type)[T.Shared room]</td>
+<td>-0.2298</td>
+<td>0.037</td>
+<td>-6.269</td>
+<td>0.000</td>
+<td>-0.302</td>
+<td>-0.158</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(instant_bookable)[T.t]</td>
+<td>0.3231</td>
+<td>0.015</td>
+<td>21.776</td>
+<td>0.000</td>
+<td>0.294</td>
+<td>0.352</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">price</td>
+<td>1.711e-05</td>
+<td>3.3e-05</td>
+<td>0.519</td>
+<td>0.604</td>
+<td>-4.75e-05</td>
+<td>8.17e-05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">review_scores_cleanliness</td>
+<td>0.1959</td>
+<td>0.007</td>
+<td>28.924</td>
+<td>0.000</td>
+<td>0.183</td>
+<td>0.209</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">review_scores_location</td>
+<td>-0.1167</td>
+<td>0.008</td>
+<td>-14.841</td>
+<td>0.000</td>
+<td>-0.132</td>
+<td>-0.101</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">review_scores_value</td>
+<td>-0.2088</td>
+<td>0.009</td>
+<td>-23.724</td>
+<td>0.000</td>
+<td>-0.226</td>
+<td>-0.192</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="4ae2c561" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mean_reviews <span class="op">=</span> df_clean[<span class="st">'number_of_reviews'</span>].mean()</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>var_reviews <span class="op">=</span> df_clean[<span class="st">'number_of_reviews'</span>].var()</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean: </span><span class="sc">{</span>mean_reviews<span class="sc">}</span><span class="ss">, Variance: </span><span class="sc">{</span>var_reviews<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Poisson AIC:"</span>, model.aic)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Negative Binomial AIC:"</span>, nb_model.aic)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>overdispersion <span class="op">=</span> var_reviews <span class="op">&gt;</span> mean_reviews <span class="op">*</span> <span class="fl">1.5</span> </span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Overdispersion?"</span>, overdispersion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 21.252323205694324, Variance: 1031.7342877315536
+Poisson AIC: 1070158.6878802574
+Negative Binomial AIC: 246285.75583628635
+Overdispersion? True</code></pre>
 </div>
 </div>
 

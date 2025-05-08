@@ -316,7 +316,25 @@ X_check = X_check.astype(float)
 glm_poisson = sm.GLM(df['patents'], X_check, family=sm.families.Poisson())
 glm_results = glm_poisson.fit()
 
-print(glm_results.summary())
+import pandas as pd
+import numpy as np
+
+# Extract values
+summary_df = pd.DataFrame({
+    "Variable": glm_results.params.index,
+    "Coefficient": glm_results.params.values,
+    "Std. Error": glm_results.bse,
+    "z-value": glm_results.tvalues,
+    "P-value": glm_results.pvalues,
+    "95% CI Lower": glm_results.conf_int()[0],
+    "95% CI Upper": glm_results.conf_int()[1]
+})
+
+# Round for readability
+summary_df = summary_df.round(4)
+
+# Display
+summary_df
 ```
 The results are mostly consistent, with some small differences in coefficient values (possibly due to different scaling, convergence settings, or data preprocessing).
 
@@ -474,7 +492,21 @@ model = smf.glm(
     family=sm.families.Poisson()
 ).fit()
 
-model.summary()
+import pandas as pd
+
+# Create formatted summary table
+summary_df = pd.DataFrame({
+    "Variable": model.params.index,
+    "Coefficient": model.params.round(4),
+    "Std. Error": model.bse.round(4),
+    "z-value": model.tvalues.round(2),
+    "P-value": model.pvalues.round(3),
+    "95% CI Lower": model.conf_int()[0].round(4),
+    "95% CI Upper": model.conf_int()[1].round(4)
+})
+
+summary_df.reset_index(drop=True, inplace=True)
+summary_df
 ```
 
 ### Interpretation of Poisson Regression Results
@@ -538,7 +570,23 @@ nb_model = smf.glm(
     family=sm.families.NegativeBinomial()
 ).fit()
 
-nb_model.summary()
+import pandas as pd
+import numpy as np
+
+# Create formatted summary table with exp(coef)
+nb_summary = pd.DataFrame({
+    "Variable": nb_model.params.index,
+    "Coefficient": nb_model.params.round(4),
+    "Exp(Coef)": np.exp(nb_model.params).round(3),
+    "Std. Error": nb_model.bse.round(4),
+    "z-value": nb_model.tvalues.round(2),
+    "P-value": nb_model.pvalues.round(3),
+    "95% CI Lower": nb_model.conf_int()[0].round(4),
+    "95% CI Upper": nb_model.conf_int()[1].round(4)
+})
+
+nb_summary.reset_index(drop=True, inplace=True)
+nb_summary
 ```
 ### Interpretation of Negative Binomial Regression Results
 
