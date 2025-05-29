@@ -37,5 +37,11 @@
   },
   "projects/project2/index.qmd": {
     "index.html": "c2491f20"
+  },
+  "projects/project3/index.qmd": {
+    "index.html": "30103047"
+  },
+  "projects/project3/Untitled-1.ipynb": {
+    "Untitled-1.html": "dc6e9eb0"
   }
 }
