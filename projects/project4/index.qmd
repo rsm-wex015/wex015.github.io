@@ -8,7 +8,6 @@ date: today
 
 ## 1a. K-Means
 
-
 ## Unsupervised Learning: Custom K-Means Clustering on Penguins
 
 ### Dataset Overview
