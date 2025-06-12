@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Wenxin Xu">
-<meta name="dcterms.date" content="2025-05-28">
+<meta name="dcterms.date" content="2025-06-08">
 
 <title>Multinomial Logit Model – Wendy</title>
 <style>
@@ -226,7 +226,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 28, 2025</p>
+      <p class="date">June 8, 2025</p>
     </div>
   </div>
   
@@ -283,7 +283,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <li><code>brand_Netflix</code>, <code>brand_Prime</code>: dummy-coded brand indicators</li>
 </ul>
 <p>The resulting data frame contains one row per alternative per task per respondent, and is now ready for MNL model estimation in the next step.</p>
-<div id="1a561c98" class="cell" data-execution_count="1">
+<div id="d30c18f6" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
@@ -301,7 +301,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview result</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>df_encoded.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 
 
@@ -380,7 +380,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <h2 class="anchored" data-anchor-id="estimation-via-maximum-likelihood">4. Estimation via Maximum Likelihood</h2>
 <p>To estimate the parameters of the Multinomial Logit model, we implement the log-likelihood function and use <code>scipy.optimize.minimize()</code> with the BFGS algorithm. The parameters correspond to the effects of Netflix, Prime, Ads, and Price on choice probabilities. We compute the Hessian matrix to estimate standard errors and construct 95% confidence intervals for each coefficient.</p>
 <p>The table below presents the MLEs, standard errors, and confidence intervals:</p>
-<div id="bd857887" class="cell" data-execution_count="2">
+<div id="ee307c42" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm</span>
@@ -433,7 +433,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>}, index<span class="op">=</span>params)</span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>mle_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -496,7 +496,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 <p>We implement a Metropolis-Hastings MCMC algorithm to sample from the posterior distribution of the parameters. We use independent normal priors: <span class="math inline">\(\beta_{\text{netflix}},\ \beta_{\text{prime}},\ \beta_{\text{ads}} \sim \mathcal{N}(0,\ 0.05)\)</span> and <span class="math inline">\(\beta_{\text{price}} \sim \mathcal{N}(0,\ 0.01)\)</span>. The proposal distribution is a multivariate normal with diagonal covariance.</p>
 <p>We run 11,000 iterations, discard the first 1,000 as burn-in, and retain 10,000 samples. Below we report posterior means, standard deviations, and 95% credible intervals.</p>
 <p>We also plot a trace and histogram of the posterior for <span class="math inline">\(\beta_{\text{price}}\)</span>:</p>
-<div id="3cb6049a" class="cell" data-execution_count="3">
+<div id="1e790213" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -576,7 +576,7 @@ u_{ij} = (1 \times Netflix_j) + (0.5 \times Prime_j) + (-0.8*Ads_j) - 0.1\times 
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
 

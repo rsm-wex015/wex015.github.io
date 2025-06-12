@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Wenxin Xu">
-<meta name="dcterms.date" content="2025-05-07">
+<meta name="dcterms.date" content="2025-06-06">
 
 <title>Poisson Regression Examples – Wendy</title>
 <style>
@@ -237,7 +237,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 7, 2025</p>
+      <p class="date">June 6, 2025</p>
     </div>
   </div>
   
@@ -258,7 +258,7 @@ window.Quarto = {
 </section>
 <section id="data" class="level3">
 <h3 class="anchored" data-anchor-id="data">Data</h3>
-<div id="abd64bda" class="cell" data-execution_count="1">
+<div id="82f0a2bb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -295,7 +295,7 @@ memory usage: 47.0+ KB</code></pre>
 </div>
 </div>
 </div>
-<div id="2f97ef1f" class="cell" data-execution_count="2">
+<div id="23dd83ad" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sns.histplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">'patents'</span>, hue<span class="op">=</span><span class="st">'iscustomer'</span>, bins<span class="op">=</span><span class="dv">30</span>, multiple<span class="op">=</span><span class="st">'dodge'</span>)</span>
@@ -312,7 +312,7 @@ memory usage: 47.0+ KB</code></pre>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="42">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>iscustomer
 0    3.473013
 1    4.133056
@@ -322,7 +322,7 @@ Name: patents, dtype: float64</code></pre>
 <p>From the histograms, we observe that firms using Blueprinty’s software tend to have a distribution shifted slightly to the right compared to those not using the software, suggesting higher patent counts.</p>
 <p>The mean number of patents is higher among customers of Blueprinty than non-customers, which may suggest an association between using the software and patenting success. However, further modeling is required to control for other factors like firm age and region.</p>
 <p>Blueprinty customers are not selected at random. It may be important to account for systematic differences in the age and regional location of customers vs non-customers.</p>
-<div id="e0ef200b" class="cell" data-execution_count="3">
+<div id="266e660e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
@@ -381,7 +381,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 <p><span class="math display">\[
 \ell(\beta) = \sum_{i=1}^{n} \left[ -\exp(X_i \beta) + Y_i X_i \beta - \log(Y_i!) \right]
 \]</span></p>
-<div id="8f8897b2" class="cell" data-execution_count="4">
+<div id="ce077d41" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -403,7 +403,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 </section>
 <section id="log-likelihood-curve-for-poisson-model" class="level3">
 <h3 class="anchored" data-anchor-id="log-likelihood-curve-for-poisson-model">Log-Likelihood Curve for Poisson Model</h3>
-<div id="5978145c" class="cell" data-execution_count="5">
+<div id="43489a8a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>y_obs_full <span class="op">=</span> df[<span class="st">'patents'</span>].values</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>lambda_range <span class="op">=</span> np.linspace(<span class="fl">0.1</span>, <span class="dv">10</span>, <span class="dv">200</span>)</span>
@@ -445,7 +445,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 \hat{\lambda}_{\text{MLE}} = \frac{1}{n} \sum_{i=1}^{n} Y_i = \bar{Y}
 \]</span></p>
 <p>This result makes intuitive sense because the mean of a Poisson distribution is <span class="math inline">\(\lambda\)</span>, so the sample mean is the natural estimate of the population mean under the MLE framework.</p>
-<div id="ee2a41bd" class="cell" data-execution_count="6">
+<div id="a97d424e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lambda_mle <span class="op">=</span> df[<span class="st">'patents'</span>].mean()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Lambda MLE (sample mean of Y): </span><span class="sc">{</span>lambda_mle<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -456,7 +456,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 </section>
 <section id="maximum-likelihood-estimation-via-optimization" class="level3">
 <h3 class="anchored" data-anchor-id="maximum-likelihood-estimation-via-optimization">Maximum Likelihood Estimation via Optimization</h3>
-<div id="afe66571" class="cell" data-execution_count="7">
+<div id="f7297800" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
@@ -484,7 +484,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 </section>
 <section id="poisson-regression-log-likelihood" class="level3">
 <h3 class="anchored" data-anchor-id="poisson-regression-log-likelihood">Poisson Regression Log-Likelihood</h3>
-<div id="0ffb6762" class="cell" data-execution_count="8">
+<div id="37901b0e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> gammaln</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -501,7 +501,7 @@ L(\beta) = \prod_{i=1}^{n} \frac{e^{-\lambda_i} \lambda_i^{Y_i}}{Y_i!}, \quad \t
 </div>
 <section id="estimate-beta-via-mle" class="level4">
 <h4 class="anchored" data-anchor-id="estimate-beta-via-mle">Estimate Beta via MLE</h4>
-<div id="1d2344d8" class="cell" data-execution_count="9">
+<div id="734b76b1" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[[<span class="st">'age'</span>]].copy()</span>
@@ -538,7 +538,7 @@ Estimated beta coefficients:
 </div>
 </div>
 <p>The Poisson regression model estimated the impact of firm characteristics on patent counts. We find that firm age is positively associated with patent output, while being a Blueprinty customer is also linked to a higher expected number of patents. Regional effects are small and mixed, with most being slightly negative relative to the omitted baseline region.</p>
-<div id="7b7797e0" class="cell" data-execution_count="10">
+<div id="3ceda36b" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[[<span class="st">'age'</span>]].copy()</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'age_squared'</span>] <span class="op">=</span> X[<span class="st">'age'</span>] <span class="op">**</span> <span class="dv">2</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'iscustomer'</span>] <span class="op">=</span> df[<span class="st">'iscustomer'</span>]</span>
@@ -548,7 +548,7 @@ Estimated beta coefficients:
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> pd.concat([X, pd.get_dummies(df[<span class="st">'region'</span>], drop_first<span class="op">=</span><span class="va">True</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X.astype(<span class="bu">float</span>).values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="82508482" class="cell" data-execution_count="11">
+<div id="146afeac" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -575,7 +575,7 @@ Estimated beta coefficients:
   0.02214911  0.04299568]</code></pre>
 </div>
 </div>
-<div id="a7ca2134" class="cell" data-execution_count="12">
+<div id="eea85ef8" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numdifftools <span class="im">as</span> nd</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -595,10 +595,10 @@ Estimated beta coefficients:
 <span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>results_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/32/xz9pd3zx1yv2tk_19psx52z40000gn/T/ipykernel_27250/820769554.py:11: RuntimeWarning: overflow encountered in exp
+<pre><code>/var/folders/32/xz9pd3zx1yv2tk_19psx52z40000gn/T/ipykernel_51676/820769554.py:11: RuntimeWarning: overflow encountered in exp
   lmbda = np.exp(linear_pred)</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="52">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -667,7 +667,7 @@ Estimated beta coefficients:
 </div>
 </div>
 <p>The inclusion of a constant term (intercept = -0.3295) ensures the model accounts for a baseline patent rate when all covariates are zero.</p>
-<div id="1fc7999a" class="cell" data-execution_count="13">
+<div id="3ac87838" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -700,7 +700,7 @@ Estimated beta coefficients:
 <span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Display</span></span>
 <span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>summary_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="53">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 
 
@@ -856,7 +856,7 @@ Estimated beta coefficients:
 </ul></li>
 <li>Compute the individual treatment effects (<code>y_pred_1 - y_pred_0</code>), and take their average.</li>
 </ol>
-<div id="6f72dbdd" class="cell" data-execution_count="14">
+<div id="7a5b7b26" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -890,7 +890,7 @@ Estimated beta coefficients:
 <pre><code>/Users/wenxinxu/Library/Python/3.9/lib/python/site-packages/statsmodels/genmod/families/links.py:13: FutureWarning: The log link alias is deprecated. Use Log instead. The log link alias will be removed after the 0.15.0 release.
   warnings.warn(</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="54">
+<div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>np.float64(0.7927680710452972)</code></pre>
 </div>
 </div>
@@ -937,13 +937,13 @@ Variable Definitions
 </div>
 </div>
 <p>We treat the <strong>number of reviews</strong> as a proxy for <strong>booking volume</strong>, based on the assumption that more bookings lead to more reviews. ### Data Overview</p>
-<div id="4ebd2565" class="cell" data-execution_count="15">
+<div id="e5d116f3" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dataset</span></span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"airbnb.csv"</span>)</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="55">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 
 
@@ -1059,11 +1059,11 @@ Variable Definitions
 </div>
 </div>
 </div>
-<div id="ffc92744" class="cell" data-execution_count="16">
+<div id="e9684beb" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary statistics and missing value inspection</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>df.describe()</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>df.isna().mean().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="56">
+<div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>review_scores_value          0.252437
 review_scores_location       0.252388
 review_scores_cleanliness    0.250935
@@ -1081,7 +1081,7 @@ instant_bookable             0.000000
 dtype: float64</code></pre>
 </div>
 </div>
-<div id="596a47aa" class="cell" data-execution_count="17">
+<div id="ec8ffab6" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.dropna(subset<span class="op">=</span>[</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'review_scores_value'</span>, </span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'review_scores_location'</span>, </span>
@@ -1091,7 +1091,7 @@ dtype: float64</code></pre>
 </section>
 <section id="modeling-poisson-regression" class="level3">
 <h3 class="anchored" data-anchor-id="modeling-poisson-regression">Modeling: Poisson Regression</h3>
-<div id="9d10c09d" class="cell" data-execution_count="18">
+<div id="570207cc" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1117,7 +1117,7 @@ dtype: float64</code></pre>
 <span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>summary_df.reset_index(drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>summary_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="58">
+<div class="cell-output cell-output-display" data-execution_count="18">
 <div>
 
 
@@ -1277,7 +1277,7 @@ dtype: float64</code></pre>
 <section id="negative-binomial-regression" class="level3">
 <h3 class="anchored" data-anchor-id="negative-binomial-regression">Negative Binomial Regression</h3>
 <p>To account for potential overdispersion in the count data (<code>number_of_reviews</code>), we fit a Negative Binomial regression model. This is more flexible than Poisson regression when the variance exceeds the mean.</p>
-<div id="cb085ca3" class="cell" data-execution_count="19">
+<div id="aeb8adf8" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1309,7 +1309,7 @@ dtype: float64</code></pre>
 <pre><code>/Users/wenxinxu/Library/Python/3.9/lib/python/site-packages/statsmodels/genmod/families/family.py:1367: ValueWarning: Negative binomial dispersion parameter alpha not set. Using default value alpha=1.0.
   warnings.warn("Negative binomial dispersion parameter alpha not "</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="59">
+<div class="cell-output cell-output-display" data-execution_count="19">
 <div>
 
 
@@ -1476,7 +1476,7 @@ dtype: float64</code></pre>
 </section>
 <section id="comparing-poisson-and-negative-binomial-models" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-poisson-and-negative-binomial-models">Comparing Poisson and Negative Binomial Models</h3>
-<div id="380222c5" class="cell" data-execution_count="20">
+<div id="78a711aa" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mean_reviews <span class="op">=</span> df_clean[<span class="st">'number_of_reviews'</span>].mean()</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>var_reviews <span class="op">=</span> df_clean[<span class="st">'number_of_reviews'</span>].var()</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean: </span><span class="sc">{</span>mean_reviews<span class="sc">}</span><span class="ss">, Variance: </span><span class="sc">{</span>var_reviews<span class="sc">}</span><span class="ss">"</span>)</span>
